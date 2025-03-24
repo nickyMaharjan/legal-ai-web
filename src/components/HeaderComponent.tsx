@@ -13,6 +13,7 @@ import {
 import ChatBubbleOutlineIcon from "@mui/icons-material/ChatBubbleOutline";
 import DrawerComp from "./DrawerComp";
 import { Link, useNavigate } from "react-router-dom";
+import SearchBarComponent from "./SearchBarComponent";
 
 const Pages = [
   "Home",
@@ -23,7 +24,7 @@ const Pages = [
   "Settings",
 ];
 
-const Header = () => {
+const HeaderComponent = () => {
   const [value, setValue] = useState(0); // Set default tab value to 0
   const theme = useTheme();
   const isMatch = useMediaQuery(theme.breakpoints.down("md"));
@@ -50,6 +51,10 @@ const Header = () => {
             <Typography variant="h6" sx={{ marginRight: "auto" }}>
               Your AI
             </Typography>
+
+            <Box>
+              <SearchBarComponent />
+            </Box>
             <DrawerComp />
           </>
         ) : (
@@ -64,6 +69,9 @@ const Header = () => {
                 <Tab key={index} label={page} />
               ))}
             </Tabs>
+            <Box>
+              <SearchBarComponent />
+            </Box>
 
             <Box sx={{ display: "flex", gap: 1, marginLeft: "auto" }}>
               <Button
@@ -90,4 +98,4 @@ const Header = () => {
   );
 };
 
-export default Header;
+export default HeaderComponent;

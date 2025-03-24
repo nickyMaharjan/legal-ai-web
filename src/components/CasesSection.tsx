@@ -8,9 +8,18 @@ const cases = [
   { title: "Need Further Articles" },
 ];
 
-const CasesSection = () => {
+const CasesSection = ({}) => {
   return (
     <>
+      <Container sx={{ mt: 4, textAlign: "center", maxWidth: "900px" }}>
+        <Typography variant="h4" sx={{ fontWeight: "bold", color: "#003366" }}>
+          Welcome, @Your Name!
+        </Typography>
+        <Typography variant="subtitle1" sx={{ mb: 2, color: "#666" }}>
+          Helping you with seamless legal research.
+        </Typography>
+      </Container>
+
       <Container sx={{ mt: 4, textAlign: "center", pr: 28 }}>
         <Typography
           variant="h5"
