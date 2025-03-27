@@ -1,11 +1,11 @@
 import PictureAsPdfIcon from "@mui/icons-material/PictureAsPdf";
 import { Box, IconButton, Paper, Typography } from "@mui/material";
-import axios from "axios";
 import { useEffect, useState } from "react";
 import { useSearchParams } from "react-router-dom"; // To access passed data
 import { SearchResult, SearchResultItem } from "../types/SearchResult";
 import * as ApiPath from "../utils/api.url";
 import { FetchState } from "../types/FetchState";
+import { axiosWithLogin } from "../utils/api.client";
 
 const SearchResultComponent = () => {
   const [params] = useSearchParams();
@@ -21,7 +21,7 @@ const SearchResultComponent = () => {
     try {
       setResult({ state: "loading" });
 
-      const response = await axios.get(ApiPath.SEARCH_URL, {
+      const response = await axiosWithLogin.get(ApiPath.SEARCH_URL, {
         headers: { "Content-Type": "application/json" },
         params: { q: searchTerm }, // Assuming search query is passed as a parameter
       });

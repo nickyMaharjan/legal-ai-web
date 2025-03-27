@@ -5,10 +5,10 @@ import DrawerComp from "./components/DrawerComp";
 //  import SearchSection from "./components/SearchSection";
 import SearchResultComponent from "./components/SearchResultComponent";
 // import Sidebar from "./components/SideBar";
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { Route, BrowserRouter as Router, Routes } from "react-router-dom";
 import ChatBotComponent from "./components/ChatBotComponent";
 import HeaderComponent from "./components/HeaderComponent";
-import SignInOutContainer from "./components/container/SignInOutContainer";
+import ProtectedLogin from "./components/ProtectedLogin";
 
 
 function App() {
@@ -16,12 +16,22 @@ function App() {
     <Router>
       <div>
         <HeaderComponent />
+        
 
         <Routes>
           {/* <Route index element={<SearchSection />} />  */}
 
-          <Route path="/search" element={<SearchResultComponent />} />
-          <Route path="/chatbot" element={<ChatBotComponent />} />
+          <Route
+            path="/search"
+            element={
+              <ProtectedLogin>
+                <SearchResultComponent />
+              </ProtectedLogin>
+            }
+          />
+          <Route path="/chatbot/" element={<ChatBotComponent />} />
+
+          {/* <Route path="/protected" element={<ProtectedLogin>a</ProtectedLogin>} /> */}
         </Routes>
 
         <CasesSection />
@@ -29,7 +39,6 @@ function App() {
 
         {/* <Sidebar /> */}
         <DrawerComp />
-        <SignInOutContainer />
       
       </div>
     </Router>
