@@ -12,9 +12,10 @@ import {
 import MarkUnreadChatAltOutlinedIcon from "@mui/icons-material/MarkUnreadChatAltOutlined";
 
 import { teal } from "@mui/material/colors";
-import axios from "axios";
+
 import * as ApiPath from "../utils/api.url";
 import Tooltip from "@mui/material/Tooltip";
+import { axiosWithLogin } from "../utils/api.client";
 
 type Message = {
   text: string;
@@ -46,7 +47,7 @@ const ChatBotComponent = () => {
     message: string,
     abortController: AbortController
   ) => {
-    const response = await axios.get(ApiPath.CHATBOT_URL + "?q=" + message, {
+    const response = await axiosWithLogin.get(ApiPath.CHATBOT_URL + "?q=" + message, {
       signal: abortController.signal,
     });
     return response;

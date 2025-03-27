@@ -18,11 +18,14 @@
     "@mui/material-next": "^6.0.0-alpha.126",
     "@tanstack/react-query": "4",
     "axios": "^1.7.9",
+    "formik": "^2.4.6",
+    "jwt-decode": "^4.0.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "react-markdown": "^10.1.0",
     "react-router-dom": "^7.3.0",
-    "sass": "^1.85.0"
+    "sass": "^1.85.0",
+    "yup": "^1.6.1"
   },
   "devDependencies": {
     "@eslint/js": "^9.19.0",

@@ -10,13 +10,15 @@ import {
   Typography,
 } from "@mui/material";
 import LockOutLinedIcon from "@mui/icons-material/LockOutlined";
-import { Link as RouterLink } from "react-router-dom";
+import { Link as RouterLink, useNavigate } from "react-router-dom";
 import Checkbox from "@mui/material/Checkbox";
 import FormControlLabel from "@mui/material/FormControlLabel";
 import FormGroup from "@mui/material/FormGroup";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
 import { useState } from "react";
+import axios from "axios";
+import * as ApiPath from "../utils/api.url";
 
 type LoginComponentProps = {
   handleChange: (newValue: number) => void;
@@ -24,9 +26,69 @@ type LoginComponentProps = {
 
 const LoginComponent = ({ handleChange }: LoginComponentProps) => {
   const [showPassword, setShowPassword] = useState(false);
+  const [credentials, setCredentials] = useState({
+    username: "",
+    password: "",
+  });
+  const [loading, setLoading] = useState(false);
+  const [loginStatus, setLoginStatus] = useState<string | null>(null);
 
   const handleClickShowPassword = () => setShowPassword(!showPassword);
-  const handleSubmit = () => console.log("login");
+
+  const handleChangeInput = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setCredentials((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+  };
+
+  const navigate = useNavigate();
+  const handleLogin = async () => {
+    if (!credentials.username || !credentials.password) {
+      setLoginStatus("Please fill in both fields");
+      return;
+    }
+
+    setLoading(true);
+    try {
+      console.log("Sending request:", JSON.stringify(credentials));
+      const response = await axios.post(
+        ApiPath.LOGIN_URL,
+        {
+          username: credentials.username,
+          password: credentials.password,
+        },
+        {
+          headers: {
+            "Content-Type": "application/json",
+
+            Accept: "application/json",
+          },
+        }
+      );
+
+      if (response.data.access_token) {
+        localStorage.setItem("token", response.data.access_token);
+        setLoginStatus("Login successful");
+        navigate("/search");
+      } else {
+        setLoginStatus("Invalid credentials");
+      }
+    } catch (error) {
+      setLoginStatus("Error occured. Please try again");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!loading) {
+      handleLogin();
+    }
+  };
+
   return (
     <Container maxWidth="xs">
       <Paper
@@ -63,6 +125,9 @@ const LoginComponent = ({ handleChange }: LoginComponentProps) => {
             fullWidth
             required
             autoFocus
+            name="username"
+            value={credentials.username}
+            onChange={handleChangeInput}
             sx={{ mb: 2 }}
           />
 
@@ -72,6 +137,9 @@ const LoginComponent = ({ handleChange }: LoginComponentProps) => {
             fullWidth
             required
             autoFocus
+            name="password"
+            value={credentials.password}
+            onChange={handleChangeInput}
             type={showPassword ? "text" : "password"}
             sx={{ mb: 1 }}
             slotProps={{
@@ -114,25 +182,36 @@ const LoginComponent = ({ handleChange }: LoginComponentProps) => {
             fullWidth
             sx={{ mt: 2, bgcolor: "#B8860B" }}
           >
-            Login
+            {loading ? "Logging in..." : "Login"}
           </Button>
+          {loginStatus && (
+            <Typography
+              variant="body2"
+              color={loginStatus === "Login successfull" ? "green" : "red"}
+              align="center"
+              sx={{ mt: 2 }}
+            >
+              {loginStatus}
+            </Typography>
+          )}
         </Box>
 
-        <Grid2 container justifyContent="space-between" sx={{ mt: 1 }}>
-          <RouterLink
-            to="/register"
-            style={{
-              textDecoration: "none",
-              fontSize: "0.75rem",
-              fontFamily: "Lato",
-              fontWeight: 400,
-              lineHeight: 1.66,
-            }}
-            onClick={() => handleChange(1)}
-          >
-            Don't have an account? Register here.
-          </RouterLink>
-        </Grid2>
+        <Box
+          justifyContent="space-between"
+          sx={{
+            mt: 1,
+            textDecoration: "none",
+            fontSize: "0.75rem",
+            fontFamily: "Lato",
+            fontWeight: 400,
+            lineHeight: 1.66,
+          }}
+        >
+          <Box component="span" sx={{ mr: 1 }}>
+            Don't have an account?
+          </Box>
+          <RouterLink to="/register">Register here.</RouterLink>
+        </Box>
       </Paper>
     </Container>
   );
