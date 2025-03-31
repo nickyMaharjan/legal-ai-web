@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import {
   AppBar,
   Box,
@@ -9,14 +9,11 @@ import {
   Typography,
   useMediaQuery,
   useTheme,
-  Modal,
 } from "@mui/material";
 import ChatBubbleOutlineIcon from "@mui/icons-material/ChatBubbleOutline";
 import DrawerComp from "./DrawerComp";
 import { useNavigate } from "react-router-dom";
 import SearchBarComponent from "./SearchBarComponent";
-import LoginComponent from "./LoginComponent";
-import SignupComponent from "./SignupComponent";
 import UploadFiles from "./UploadFiles";
 
 const Pages = [
@@ -30,9 +27,7 @@ const Pages = [
 
 const HeaderComponent = () => {
   const [value, setValue] = useState(0); // Set default tab value to 0
-  const [openLoginModal, setOpenLoginModal] = useState(false); // state to open login Modal
-  const [openSignupModal, setOpenSignupModal] = useState(false);
-  
+
   const theme = useTheme();
   const isMatch = useMediaQuery(theme.breakpoints.down("md"));
   const navigate = useNavigate();
@@ -43,16 +38,10 @@ const HeaderComponent = () => {
     //  if the Home tab is selected
     if (newValue === 0) {
       navigate("/"); // Navigate to the home page (root path)
-    } else if (newValue === 3){
-
-    
+    } else if (newValue === 3) {
     } else {
       navigate(`/${Pages[newValue].toLowerCase().replace(/\s+/g, "")}`);
     }
-  };
-
-  const handleLoginInputChange = () => {
-    console.log("Input Changed:");
   };
 
   return (
@@ -92,14 +81,14 @@ const HeaderComponent = () => {
                 <Button
                   variant="contained"
                   size="small"
-                  onClick={() => setOpenLoginModal(true)}
+                  onClick={() => navigate("/login")}
                 >
                   Login
                 </Button>
                 <Button
                   variant="contained"
                   size="small"
-                  onClick={() => setOpenSignupModal(true)}
+                  onClick={() => navigate("/signup")}
                 >
                   SignUp
                 </Button>
@@ -108,39 +97,7 @@ const HeaderComponent = () => {
           )}
         </Toolbar>
       </AppBar>
-      <Box>
-      {value === 3 && <UploadFiles />}
-      </Box>
-
-      <Modal
-        open={openLoginModal}
-        onClose={() => setOpenLoginModal(false)}
-        sx={{
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-        }}
-      >
-        <Box sx={{ backgroundColor: "white", padding: 3, borderRadius: 2 }}>
-          <LoginComponent handleChange={handleLoginInputChange} />
-        </Box>
-      </Modal>
-
-      <Modal
-        open={openSignupModal}
-        onClose={() => setOpenSignupModal(false)}
-        sx={{
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-        }}
-      >
-        <Box sx={{ backgroundColor: "white", padding: 1, borderRadius: 1 }}>
-          <SignupComponent />
-        </Box>
-      </Modal>
-
-      
+      <Box>{value === 3 && <UploadFiles />}</Box>
     </>
   );
 };

@@ -12,6 +12,7 @@ import { styled } from "@mui/material/styles";
 import { axiosWithLogin } from "../utils/api.client";
 
 type UploadStatus = "idle" | "uploading" | "success" | "error";
+const MAX_FILE_SIZE = 5 * 1024 * 1024; //  upto 5MB limit
 
 // styled hidden input for file selection
 const VisuallyHiddenInput = styled("input")({
@@ -29,11 +30,20 @@ const VisuallyHiddenInput = styled("input")({
 const UploadFiles = () => {
   const [file, setFile] = useState<File | null>(null); // state for uploading files
   const [status, setStatus] = useState<UploadStatus>("idle"); // state for checking status
+  const[fileError, setFileError]= useState<string>(""); // state for file size error
 
   // upload files logic
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
-      setFile(e.target.files[0]);
+      const selectedFile = e.target.files[0];
+      if(selectedFile.size > MAX_FILE_SIZE){
+        setFileError("File size exceeds the 5MB limit. ");
+        setFile(null); // Reset file
+      }else{
+        setFile(selectedFile);
+        setFileError(""); // clear previous error
+      }
+     
     }
   };
 
@@ -49,9 +59,11 @@ const UploadFiles = () => {
       const fileUploadResponse = await axiosWithLogin.post(
         ApiPath.FILE_UPLOAD_URL,
         formData,
-        {headers: {
-            "Content-Type": 'multipart/form-data'
-        }}
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        }
       );
       const responseObj = fileUploadResponse.data;
       console.log(responseObj.requestId);
@@ -91,29 +103,39 @@ const UploadFiles = () => {
             multiple
           />
         </Button>
-        {file && (
+         {file && (
           <Box sx={{ marginBottom: 2 }}>
             <Typography variant="body2">
               File name: <strong>{file.name}</strong>
             </Typography>
-            <Typography variant="body2">
+            </Box>
+         )}
+            {/* <Typography variant="body2">
               Size: <strong>{(file.size / 1024).toFixed(2)} KB</strong>
             </Typography>
             <Typography variant="body2">
               Type: <strong>{file.type}</strong>
             </Typography>
           </Box>
-        )}
+        )} */}
 
         {file && status !== "uploading" && (
-          <Button variant="contained" onClick={handleFileUpload}>
+          <Box sx={{textAlign:"center", mb:2, mt:3}}>
+
+          
+          <Button variant="contained" onClick={handleFileUpload}
+          sx={{
+            fontSize:"1.2rem",
+            mt:2,
+          }}>
             Upload File
           </Button>
+          </Box>
         )}
 
         {status === "uploading" && (
           <Box
-            sx={{ display: "flex", justifyContent: "center", marginBottom: 2 }}
+            sx={{ display: "flex", justifyContent: "center", marginBottom: 2, }}
           >
             <CircularProgress />
           </Box>
@@ -138,6 +160,12 @@ const UploadFiles = () => {
             className="mt-2"
           >
             Upload failed. Please try again.
+          </Typography>
+        )}
+
+        {fileError && (
+          <Typography variant="body2" color="error.main" align="center" className="mt-2">
+            {fileError}
           </Typography>
         )}
       </Paper>
