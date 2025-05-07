@@ -1,6 +1,8 @@
-import React, { useEffect, useState } from "react";
-// import { Form, useLocation, useNavigate } from "react-router-dom";
-import { Form } from "formik";
+"use client";
+
+import type React from "react";
+import { useEffect, useState } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
 import {
   Modal,
   Box,
@@ -11,39 +13,32 @@ import {
   FormControlLabel,
   FormGroup,
   FormHelperText,
-  Grid2,
   IconButton,
-  Paper,
   TextField,
+  Divider,
+  InputAdornment,
+  CircularProgress,
+  Paper,
 } from "@mui/material";
-import { Formik, Field, ErrorMessage, FormikHelpers } from "formik";
+import { Formik, Field, ErrorMessage, Form, type FormikHelpers } from "formik";
 import * as Yup from "yup";
 import axios from "axios";
 import * as ApiPath from "../utils/api.url";
-import AddCircleOutlineOutlinedIcon from "@mui/icons-material/AddCircleOutlineOutlined";
 import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
 import VisibilityIcon from "@mui/icons-material/Visibility";
-import { useLocation, useNavigate } from "react-router-dom";
-import Grid from '@mui/material/Grid'; 
-
+import BalanceIcon from "@mui/icons-material/Balance";
 
 const SignupComponent: React.FC = () => {
-    
   const location = useLocation();
   const navigate = useNavigate();
   const [open, setOpen] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
-  const paperStyle = {
-    padding: "20px 16px",
-    width: "100%",
-    maxWidth: "400px",
-    margin: "20px auto",
-    height: "auto",
-    minHeight: "auto",
-  };
+  const handleClickShowPassword = () => setShowPassword(!showPassword);
+  const handleClickShowConfirmPassword = () =>
+    setShowConfirmPassword(!showConfirmPassword);
 
-  const headerStyle = { margin: 0 };
-  const avatarStyle = { backgroundColor: "#003366" };
   const initialValues = {
     firstname: "",
     lastname: "",
@@ -66,17 +61,9 @@ const SignupComponent: React.FC = () => {
     navigate(-1); // Go back to the previous page
   };
 
-  const [showPassword, setShowPassword] = useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-
-  const handleClickShowPassword = () => setShowPassword(!showPassword);
-  const handleClickShowConfirmPassword = () =>
-    setShowConfirmPassword(!showConfirmPassword);
-
   const validationSchema = Yup.object().shape({
     firstname: Yup.string().min(3, "It's too short").required("Required"),
     lastname: Yup.string().min(3, "It's too short").required("Required"),
-
     phonenumber: Yup.number()
       .typeError("Enter valid Phone Number")
       .required("Required"),
@@ -88,11 +75,11 @@ const SignupComponent: React.FC = () => {
     confirmPassword: Yup.string()
       .oneOf([Yup.ref("password")], "Password not matched")
       .required("Required"),
-
     termsAndCondition: Yup.boolean()
       .oneOf([true], "Accept terms & conditions")
       .required("Required"),
   });
+
   const handleSubmit = async (
     values: typeof initialValues,
     { setSubmitting }: FormikHelpers<typeof initialValues>
@@ -101,7 +88,6 @@ const SignupComponent: React.FC = () => {
       const response = await axios.post(ApiPath.SIGNUP_URL, values, {
         headers: {
           "Content-Type": "application/json",
-
           Accept: "application/json",
         },
       });
@@ -118,131 +104,233 @@ const SignupComponent: React.FC = () => {
     <Modal
       open={open}
       onClose={handleClose}
-      sx={{ display: "flex", alignItems: "center", justifyContent: "center" }}
+      sx={{
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        p: 2,
+      }}
+      BackdropProps={{
+        sx: {
+          backgroundColor: "rgba(0, 0, 0, 0.5)",
+        },
+      }}
     >
-      <Box
+      <Paper
+        elevation={24}
         sx={{
-          bgcolor: "white",
-          p: 3,
-          borderRadius: "8px",
-          boxShadow: 24,
-          minWidth: "300px",
-          maxHeight: "80vh", // Set max height to make it scrollable
-          overflowY: "auto", // Enable vertical scrolling
+          width: "100%",
+          maxWidth: "900px",
+          overflow: "hidden",
+          borderRadius: 0,
+          display: "flex",
+          flexDirection: { xs: "column", md: "row" },
+          maxHeight: { xs: "90vh", md: "80vh" },
         }}
       >
-        <Grid2
-          container
-          justifyContent="center"
-          alignItems="center"
-          sx={{ width: "100%", maxWidth: 400 }}
+        {/* Left Panel - Dark Blue with Dotted Pattern */}
+        <Box
+          sx={{
+            width: { xs: "100%", md: "40%" },
+            bgcolor: "#1e2c69",
+            color: "white",
+            display: "flex",
+            flexDirection: "column",
+            justifyContent: "center",
+            alignItems: "center",
+            p: 4,
+            minHeight: { xs: "180px", md: "auto" },
+            position: "relative",
+            overflow: "hidden",
+          }}
         >
-          <Paper
-            elevation={20}
+          {/* Pre-rendered dot pattern overlay */}
+          <Box
             sx={{
-              marginTop: 3,
-              padding: 2,
-              width: "100%",
-              maxWidth: "400px",
-              height: "auto",
-              overflowY: "auto",
+              position: "absolute",
+              top: 0,
+              left: 0,
+              right: 0,
+              bottom: 0,
+              opacity: 0.15,
+              backgroundImage: `url("data:image/svg+xml,%3Csvg width='20' height='20' xmlns='http://www.w3.org/2000/svg'%3E%3Ccircle cx='2' cy='2' r='2' fill='white'/%3E%3C/svg%3E")`,
+              backgroundSize: "20px 20px",
+              willChange: "transform",
+              zIndex: 0,
             }}
-            style={paperStyle}
+          />
+
+          <Box
+            sx={{
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              justifyContent: "center",
+              textAlign: "center",
+              width: "100%",
+              zIndex: 1,
+            }}
           >
-            <Grid2 justifyItems="center">
-              <Avatar style={avatarStyle}>
-                <AddCircleOutlineOutlinedIcon />
-              </Avatar>
-              <h1 style={headerStyle}>Register Now</h1>
-              <Typography variant="caption" gutterBottom>
-                Please fill this form to create an account !
-              </Typography>
-            </Grid2>
-
-            <Formik
-              initialValues={initialValues}
-              validationSchema={validationSchema}
-              onSubmit={handleSubmit}
+            <Avatar
+              sx={{
+                bgcolor: "white",
+                width: 60,
+                height: 60,
+                mb: 2,
+              }}
             >
-              {({ handleSubmit }) => (
-                <Form onSubmit={handleSubmit}>
-                  <Field
-                    as={TextField}
-                    name="firstname"
-                    label="First Name"
-                    placeholder="Enter your first name"
-                    helperText={<ErrorMessage name="firstname" />}
-                    fullWidth
-                    required
-                    autoFocus
-                    sx={{ mb: 1 }}
-                  />
+              <BalanceIcon sx={{ fontSize: 30, color: "#1e2c69" }} />
+            </Avatar>
+            <Typography variant="h4" fontWeight="bold" gutterBottom>
+              Legal AI Portal
+            </Typography>
+            <Typography variant="body1" sx={{ mt: 1 }}>
+              Create your account to get started
+            </Typography>
+          </Box>
+        </Box>
 
-                  <Field
-                    as={TextField}
-                    name="lastname"
-                    label=" Last Name"
-                    placeholder="Enter your last name"
-                    helperText={<ErrorMessage name="lastname" />}
-                    fullWidth
-                    required
-                    autoFocus
-                    sx={{ mb: 1 }}
-                  />
+        {/* Right Panel - White Form */}
+        <Box
+          sx={{
+            width: { xs: "100%", md: "60%" },
+            bgcolor: "#ffffff",
+            p: { xs: 2, sm: 4 },
+            overflowY: "auto",
+          }}
+        >
+          <Box sx={{ textAlign: "center", mb: 3 }}>
+            <Avatar
+              sx={{
+                mx: "auto",
+                bgcolor: "#1e2c69",
+                width: 40,
+                height: 40,
+                mb: 1,
+              }}
+            >
+              <BalanceIcon sx={{ fontSize: 20 }} />
+            </Avatar>
+            <Typography variant="h5" fontWeight="bold" color="#1e2c69">
+              Register Now
+            </Typography>
+            <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5 }}>
+              Please fill this form to create an account
+            </Typography>
+          </Box>
 
+          <Formik
+            initialValues={initialValues}
+            validationSchema={validationSchema}
+            onSubmit={handleSubmit}
+          >
+            {({ isSubmitting }) => (
+              <Form>
+                <Box
+                  sx={{
+                    display: "flex",
+                    flexDirection: { xs: "column", sm: "row" },
+                    gap: 2,
+                    mb: 2,
+                  }}
+                >
+                  <Box sx={{ flex: 1 }}>
+                    <Field
+                      as={TextField}
+                      name="firstname"
+                      label="First Name *"
+                      placeholder="Enter your first name"
+                      fullWidth
+                      variant="outlined"
+                      helperText={<ErrorMessage name="firstname" />}
+                      FormHelperTextProps={{
+                        sx: { color: "error.main" },
+                      }}
+                    />
+                  </Box>
+                  <Box sx={{ flex: 1 }}>
+                    <Field
+                      as={TextField}
+                      name="lastname"
+                      label="Last Name *"
+                      placeholder="Enter your last name"
+                      fullWidth
+                      variant="outlined"
+                      helperText={<ErrorMessage name="lastname" />}
+                      FormHelperTextProps={{
+                        sx: { color: "error.main" },
+                      }}
+                    />
+                  </Box>
+                </Box>
+
+                <Box sx={{ mb: 2 }}>
                   <Field
                     as={TextField}
                     name="phonenumber"
-                    label="Phone Number"
+                    label="Phone Number *"
                     placeholder="Enter your number"
-                    helperText={<ErrorMessage name="phonenumber" />}
                     fullWidth
-                    required
-                    autoFocus
-                    sx={{ mb: 1 }}
+                    variant="outlined"
+                    helperText={<ErrorMessage name="phonenumber" />}
+                    FormHelperTextProps={{
+                      sx: { color: "error.main" },
+                    }}
                   />
+                </Box>
 
+                <Box sx={{ mb: 2 }}>
                   <Field
                     as={TextField}
                     name="email"
-                    label="Email"
+                    label="Email *"
                     placeholder="Enter your email"
-                    helperText={<ErrorMessage name="email" />}
                     fullWidth
-                    required
-                    autoFocus
-                    sx={{ mb: 1 }}
+                    variant="outlined"
+                    helperText={<ErrorMessage name="email" />}
+                    FormHelperTextProps={{
+                      sx: { color: "error.main" },
+                    }}
                   />
+                </Box>
 
+                <Box sx={{ mb: 2 }}>
                   <Field
                     as={TextField}
                     name="username"
-                    label="User Name"
+                    label="Username *"
                     placeholder="Enter your username"
-                    helperText={<ErrorMessage name="username" />}
                     fullWidth
-                    required
-                    autoFocus
-                    sx={{ mb: 1 }}
+                    variant="outlined"
+                    helperText={<ErrorMessage name="username" />}
+                    FormHelperTextProps={{
+                      sx: { color: "error.main" },
+                    }}
                   />
+                </Box>
 
+                <Box sx={{ mb: 2 }}>
                   <Field
                     as={TextField}
                     name="password"
-                    label="Password"
+                    label="Password *"
                     placeholder="Enter your password"
-                    helperText={<ErrorMessage name="password" />}
                     fullWidth
-                    required
-                    autoFocus
+                    variant="outlined"
                     type={showPassword ? "text" : "password"}
-                    sx={{ mb: 1 }}
-                    slotProps={{
-                      input: {
-                        endAdornment: (
+                    helperText={<ErrorMessage name="password" />}
+                    FormHelperTextProps={{
+                      sx: { color: "error.main" },
+                    }}
+                    InputProps={{
+                      endAdornment: (
+                        <InputAdornment position="end">
                           <IconButton
                             onClick={handleClickShowPassword}
                             edge="end"
+                            aria-label={
+                              showPassword ? "hide password" : "show password"
+                            }
                           >
                             {showPassword ? (
                               <VisibilityOffIcon />
@@ -250,28 +338,36 @@ const SignupComponent: React.FC = () => {
                               <VisibilityIcon />
                             )}
                           </IconButton>
-                        ),
-                      },
+                        </InputAdornment>
+                      ),
                     }}
                   />
+                </Box>
 
+                <Box sx={{ mb: 2 }}>
                   <Field
                     as={TextField}
                     name="confirmPassword"
-                    label="Confirm Password"
-                    placeholder="Enter your confirm password"
-                    helperText={<ErrorMessage name="confirmPassword" />}
+                    label="Confirm Password *"
+                    placeholder="Confirm your password"
                     fullWidth
-                    required
-                    autoFocus
+                    variant="outlined"
                     type={showConfirmPassword ? "text" : "password"}
-                    sx={{ mb: 1 }}
-                    slotProps={{
-                      input: {
-                        endAdornment: (
+                    helperText={<ErrorMessage name="confirmPassword" />}
+                    FormHelperTextProps={{
+                      sx: { color: "error.main" },
+                    }}
+                    InputProps={{
+                      endAdornment: (
+                        <InputAdornment position="end">
                           <IconButton
                             onClick={handleClickShowConfirmPassword}
                             edge="end"
+                            aria-label={
+                              showConfirmPassword
+                                ? "hide password"
+                                : "show password"
+                            }
                           >
                             {showConfirmPassword ? (
                               <VisibilityOffIcon />
@@ -279,11 +375,13 @@ const SignupComponent: React.FC = () => {
                               <VisibilityIcon />
                             )}
                           </IconButton>
-                        ),
-                      },
+                        </InputAdornment>
+                      ),
                     }}
                   />
+                </Box>
 
+                <Box sx={{ mb: 3 }}>
                   <FormGroup>
                     <FormControlLabel
                       control={
@@ -293,33 +391,73 @@ const SignupComponent: React.FC = () => {
                           color="primary"
                         />
                       }
-                      label="I accept the terms and conditions."
-                      sx={{ alignSelf: "start" }}
+                      label={
+                        <Typography variant="body2">
+                          I accept the terms and conditions
+                        </Typography>
+                      }
                     />
                   </FormGroup>
-                  <FormHelperText>
+                  <FormHelperText sx={{ color: "error.main", ml: 2 }}>
                     <ErrorMessage name="termsAndCondition" />
                   </FormHelperText>
+                </Box>
 
-                  <Button
-                    type="submit"
-                    color="primary"
-                    variant="contained"
-                    fullWidth
-                    sx={{
-                      height: "30",
-                      marginTop: 0,
-                      bgcolor: "#003366",
-                    }}
-                  >
-                    Sign Up
-                  </Button>
-                </Form>
-              )}
-            </Formik>
-          </Paper>
-        </Grid2>
-      </Box>
+                <Button
+                  type="submit"
+                  variant="contained"
+                  fullWidth
+                  disabled={isSubmitting}
+                  sx={{
+                    py: 1.5,
+                    bgcolor: "#1e2c69",
+                    borderRadius: 0,
+                    textTransform: "none",
+                    fontSize: "1rem",
+                    fontWeight: 600,
+                    "&:hover": {
+                      bgcolor: "#162052",
+                    },
+                  }}
+                >
+                  {isSubmitting ? (
+                    <CircularProgress size={24} color="inherit" />
+                  ) : (
+                    "Sign Up"
+                  )}
+                </Button>
+
+                <Divider sx={{ my: 2 }}>
+                  <Typography variant="body2" color="text.secondary">
+                    OR
+                  </Typography>
+                </Divider>
+
+                <Box sx={{ textAlign: "center" }}>
+                  <Typography variant="body2" color="text.secondary">
+                    Already have an account?{" "}
+                    <Button
+                      onClick={() => navigate("/login")}
+                      sx={{
+                        textTransform: "none",
+                        fontWeight: 600,
+                        color: "#1e2c69",
+                        p: 0,
+                        "&:hover": {
+                          bgcolor: "transparent",
+                          textDecoration: "underline",
+                        },
+                      }}
+                    >
+                      Sign in
+                    </Button>
+                  </Typography>
+                </Box>
+              </Form>
+            )}
+          </Formik>
+        </Box>
+      </Paper>
     </Modal>
   );
 };

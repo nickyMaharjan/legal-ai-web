@@ -9,6 +9,8 @@ import ProtectedLogin from "./components/ProtectedLogin";
 import UploadFiles from "./components/UploadFiles";
 import LoginModalComponent from "./components/LoginModalComponent";
 import SignupModalComponent from "./components/SignupModalComponent";
+import ViewDocs from "./components/ViewDocs";
+import NewsSection from "./components/News";
 
 function App() {
   return (
@@ -40,6 +42,22 @@ function App() {
           <Route path="/login" element={<LoginModalComponent />} />
 
           <Route path="/signup" element={<SignupModalComponent />} />
+          <Route
+            path="/ViewDocs"
+            element={
+              <ProtectedLogin>
+                <ViewDocs />
+              </ProtectedLogin>
+            }
+          />
+           <Route
+            path="/news"
+            element={
+             
+                <NewsSection />
+              
+            }
+          />
         </Routes>
 
         <CasesSection />
